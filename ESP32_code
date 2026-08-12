@@ -1,0 +1,40 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+
+const char* ssid = "";
+const char* password = "";
+const char* serverName = "";
+
+void setup() {
+  Serial.begin(115200);
+  
+  WiFi.begin(ssid, password);
+  while(WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConnected!");
+}
+
+void loop() {
+  if(WiFi.status() == WL_CONNECTED){
+    HTTPClient http;
+    
+    http.begin(serverName);
+    http.addHeader("User-Agent", "Mozilla/5.0");
+    
+    int httpResponseCode = http.GET();
+    
+    if (httpResponseCode > 0) {
+      String payload = http.getString();
+      Serial.print("Robot Command: ");
+      Serial.println(payload);
+    } else {
+      Serial.print("Error code: ");
+      Serial.println(httpResponseCode);
+    }
+    http.end();
+  }
+  
+  delay(1000);
+}
